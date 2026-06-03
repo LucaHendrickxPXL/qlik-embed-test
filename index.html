@@ -15,106 +15,27 @@
       data-auth-type="Oauth2"
       data-auto-redirect="true"
     ></script>
-
-    <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f4f4f4;
-}
-
-header {
-  padding: 16px 24px;
-  background: #1f1f1f;
-  color: white;
-}
-
-main {
-  padding: 24px;
-}
-
-.card {
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 20px;
-  box-sizing: border-box;
-  overflow: hidden;
-}
-
-.selections-card {
-  min-height: 120px;
-  position: sticky;
-  top: 0;
-  z-index: 20;
-}
-
-.qlik-selections {
-  display: block;
-  width: 100%;
-  height: 70px;
-}
-
-.sheet-card {
-  height: 900px;
-}
-
-.qlik-sheet {
-  display: block;
-  width: 100%;
-  height: 800px;
-}
-
-.chart-card {
-  height: 500px;
-}
-
-.qlik-chart {
-  display: block;
-  width: 100%;
-  height: 420px;
-}
-    </style>
   </head>
 
   <body>
-    <header>
-      <h1>Qlik Embed CRM POC</h1>
-    </header>
+    <h1>Qlik Embed CRM POC</h1>
 
-<main>
-  <section class="card selections-card">
-    <h2>Selecties</h2>
-
-    <qlik-embed
-      class="qlik-selections"
-      ui="analytics/selections"
-      app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
-    ></qlik-embed>
-  </section>
-
-  <section class="card sheet-card">
     <h2>Volledige sheet</h2>
 
     <qlik-embed
-      class="qlik-sheet"
       ui="classic/app"
       app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
       sheet-id="510222ff-5d05-4b8c-9c75-9cb059a3f215"
+      style="display: block; width: 100%; height: 850px;"
     ></qlik-embed>
-  </section>
 
-  <section class="card chart-card">
     <h2>Losse visualisatie</h2>
 
     <qlik-embed
-      class="qlik-chart"
       ui="classic/chart"
       app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
       object-id="4904f33b-c224-41af-9175-7661f2abea30"
+      style="display: block; width: 100%; height: 420px;"
     ></qlik-embed>
-  </section>
-</main>
   </body>
 </html>
