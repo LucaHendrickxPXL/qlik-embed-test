@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Qlik Embed CRM POC</title>
+
+    <script
+      crossorigin="anonymous"
+      type="application/javascript"
+      src="https://cdn.jsdelivr.net/npm/@qlik/embed-web-components@1/dist/index.min.js"
+      data-host="https://arte.eu.qlikcloud.com"
+      data-client-id="JOUW_OAUTH_CLIENT_ID"
+      data-redirect-uri="https://JOUW-VERCEL-URL.vercel.app/oauth-callback.html"
+      data-access-token-storage="session"
+      data-auto-redirect="true"
+    ></script>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+      }
+
+      header {
+        padding: 16px 24px;
+        background: #1f1f1f;
+        color: white;
+      }
+
+      main {
+        padding: 24px;
+      }
+
+      .card {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 20px;
+      }
+
+      .selections {
+        min-height: 56px;
+      }
+
+      .sheet {
+        height: 850px;
+      }
+
+      .chart {
+        height: 420px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <h1>Qlik Embed CRM POC</h1>
+    </header>
+
+    <main>
+      <section class="card selections">
+        <h2>Selecties</h2>
+
+        <qlik-embed
+          ui="analytics/selections"
+          app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
+        ></qlik-embed>
+      </section>
+
+      <section class="card sheet">
+        <h2>Volledige sheet</h2>
+
+        <qlik-embed
+          ui="analytics/sheet"
+          app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
+          object-id="510222ff-5d05-4b8c-9c75-9cb059a3f215"
+        ></qlik-embed>
+      </section>
+
+      <section class="card chart">
+        <h2>Losse visualisatie</h2>
+
+        <qlik-embed
+          ui="analytics/chart"
+          app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
+          object-id="4904f33b-c224-41af-9175-7661f2abea30"
+        ></qlik-embed>
+      </section>
+    </main>
+  </body>
+</html>
