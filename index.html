@@ -1,10 +1,143 @@
 <!DOCTYPE html>
 <html lang="nl">
-<body>
-  <h2>Qlik Embed POC</h2>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <p><a href="/customer.html">Customer</a></p>
-  <p><a href="/product.html">Product</a></p>
-  <p><a href="/sales.html">Sales</a></p>
+  <script
+    src="https://cdn.jsdelivr.net/npm/@qlik/embed-web-components@1/dist/index.min.js"
+    data-host="https://arte.eu.qlikcloud.com"
+    data-client-id="019e8d5cbb34e31736201232f6779af7"
+    data-redirect-uri="https://qlik-embed-test-ed7r.vercel.app/index.html"
+    data-access-token-storage="session"
+    data-auth-type="Oauth2"
+    data-auto-redirect="true">
+  </script>
+
+  <script
+    data-host="https://arte.eu.qlikcloud.com"
+    src="https://cdn.jsdelivr.net/npm/@qlik/api@2/oauth-callback.iife.js">
+  </script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .menu {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .chart {
+      width: 100%;
+      height: 400px;
+    }
+
+    .chart qlik-embed {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="menu">
+    <select id="pageSelect">
+      <option value="customer">Customer pagina</option>
+      <option value="product">Product pagina</option>
+    </select>
+  </div>
+
+  <div id="page"></div>
+
+  <script type="module">
+
+    async function setVars(id, vars) {
+      const ref = await document.getElementById(id).getRefApi();
+      const doc = await ref.getDoc();
+
+      for (const [name, value] of Object.entries(vars)) {
+        await (await doc.getVariableByName(name)).setStringValue(value);
+      }
+    }
+
+    async function showCustomerPage() {
+      document.getElementById("page").innerHTML = `
+        <div class="chart">
+          <qlik-embed
+            id="customer-ytd"
+            ui="analytics/chart"
+            app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
+            object-id="d7d99717-a833-4f89-9b36-338c2a2a92d2"
+            identity="customer-ytd"
+            preview="true">
+          </qlik-embed>
+        </div>
+
+        <div class="chart">
+          <qlik-embed
+            id="customer-mtd"
+            ui="analytics/chart"
+            app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
+            object-id="d7d99717-a833-4f89-9b36-338c2a2a92d2"
+            identity="customer-mtd"
+            preview="true">
+          </qlik-embed>
+        </div>
+      `;
+
+      await setVars("customer-ytd", {
+        vTimeFrame: "Year To Date",
+        vDyDim1: "Sold To Customer"
+      });
+
+      await setVars("customer-mtd", {
+        vTimeFrame: "Current Month To Date",
+        vDyDim1: "Material"
+      });
+    }
+
+    async function showProductPage() {
+      document.getElementById("page").innerHTML = `
+        <div class="chart">
+          <qlik-embed
+            id="product-chart"
+            ui="analytics/chart"
+            app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
+            object-id="d7d99717-a833-4f89-9b36-338c2a2a92d2"
+            identity="product"
+            preview="true">
+          </qlik-embed>
+        </div>
+      `;
+
+      await setVars("product-chart", {
+        vTimeFrame: "Current Month To Date",
+        vDyDim1: "Material"
+      });
+    }
+
+    async function showPage(page) {
+      if (page === "customer") {
+        await showCustomerPage();
+      }
+
+      if (page === "product") {
+        await showProductPage();
+      }
+    }
+
+    document.getElementById("pageSelect").addEventListener("change", e => {
+      showPage(e.target.value);
+    });
+
+    showPage("customer");
+
+  </script>
+
 </body>
 </html>
