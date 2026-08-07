@@ -122,22 +122,30 @@
       }
     }
 
+    async function clearSelections(id) {
+      const embed = document.getElementById(id);
+      const ref = await embed.getRefApi();
+      const doc = await ref.getDoc();
+
+      await doc.clearAll(true);
+    }
+
     async function setSelections(id, selections) {
-  const embed = document.getElementById(id);
-  const ref = await embed.getRefApi();
-  const doc = await ref.getDoc();
+      const embed = document.getElementById(id);
+      const ref = await embed.getRefApi();
+      const doc = await ref.getDoc();
 
-  for (const [fieldName, values] of Object.entries(selections)) {
-    const field = await doc.getField(fieldName);
+      for (const [fieldName, values] of Object.entries(selections)) {
+        const field = await doc.getField(fieldName);
 
-    await field.clear();
+        await field.clear();
 
-    await field.selectValues(
-      (Array.isArray(values) ? values : [values])
-        .map(value => ({ qText: value }))
-    );
-  }
-}
+        await field.selectValues(
+          (Array.isArray(values) ? values : [values])
+            .map(value => ({ qText: value }))
+        );
+      }
+    }
 
 
     async function showOrderProfitsPage() {
