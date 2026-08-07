@@ -163,22 +163,26 @@
 
       await Promise.all([
         setVars("customer-trend", {
-          vTimeFrame: "All Time"
+          vTimeFrame: "All Time",
+          vMeasCRM: 'Delivered Turnover'
         }),
 
         setVars("customer-ranking-1", {
           vTimeFrame: "Current Year",
-          vDyDimCrm: "Group Material"
+          vDyDimCrm: "Group Material",
+          vMeasCRM: 'Delivered Turnover'
         }),
 
         setVars("customer-table", {
           vTimeFrame: "Current Year",
-          vDyDimCrm: "Group Material"
+          vDyDimCrm: "Group Material",
+          vMeasCRM: 'Delivered Turnover'
         }),
 
         setVars("customer-ranking-2", {
           vTimeFrame: "Current Year",
-          vDyDimCrm: "Division"
+          vDyDimCrm: "Division",
+          vMeasCRM: 'Delivered Turnover'
         })
       ]);
     }
