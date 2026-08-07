@@ -208,6 +208,12 @@
       `;
 
       await customElements.whenDefined("qlik-embed");
+      await Promise.all([
+        clearSelections("customer-trend"),
+        clearSelections("customer-ranking-1"),
+        clearSelections("customer-table"),
+        clearSelections("customer-ranking-2")
+      ]);
 
       await Promise.all([
         setVars("customer-trend", {
@@ -295,7 +301,12 @@
 
       await customElements.whenDefined("qlik-embed");
 
-      
+      await Promise.all([
+        clearSelections("samples-pareto"),
+        clearSelections("samples-ranking"),
+        clearSelections("samples-trend")
+      ]);
+
       await Promise.all([
         setVars("samples-pareto", {
           vTimeFrame: "Current Month",
