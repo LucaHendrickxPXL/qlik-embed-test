@@ -20,33 +20,42 @@
   </script>
 
   <style>
-    qlik-embed {
-      display: block;
+    .chart {
       width: 100%;
       height: 400px;
+    }
+
+    .chart qlik-embed {
+      display: block;
+      width: 100%;
+      height: 100%;
     }
   </style>
 </head>
 
 <body>
 
-  <qlik-embed
-    id="chart-ytd"
-    ui="analytics/chart"
-    app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
-    object-id="d7d99717-a833-4f89-9b36-338c2a2a92d2"
-    identity="ytd"
-    preview="true">
-  </qlik-embed>
+  <div class="chart">
+    <qlik-embed
+      id="chart-ytd"
+      ui="analytics/chart"
+      app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
+      object-id="d7d99717-a833-4f89-9b36-338c2a2a92d2"
+      identity="ytd"
+      preview="true">
+    </qlik-embed>
+  </div>
 
-  <qlik-embed
-    id="chart-mtd"
-    ui="analytics/chart"
-    app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
-    object-id="d7d99717-a833-4f89-9b36-338c2a2a92d2"
-    identity="mtd"
-    preview="true">
-  </qlik-embed>
+  <div class="chart">
+    <qlik-embed
+      id="chart-mtd"
+      ui="analytics/chart"
+      app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
+      object-id="d7d99717-a833-4f89-9b36-338c2a2a92d2"
+      identity="mtd"
+      preview="true">
+    </qlik-embed>
+  </div>
 
   <script type="module">
     async function setVars(id, vars) {
