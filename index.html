@@ -35,7 +35,13 @@
       height: 400px;
     }
 
-    .chart qlik-embed {
+    .dashboard {
+      width: 100%;
+      height: calc(100vh - 50px);
+    }
+
+    .chart qlik-embed,
+    .dashboard qlik-embed {
       display: block;
       width: 100%;
       height: 100%;
@@ -47,8 +53,7 @@
 
   <div class="menu">
     <select id="pageSelect">
-      <option value="customer">Customer pagina</option>
-      <option value="product">Product pagina</option>
+      <option value="order-profits">Order Profits</option>
     </select>
   </div>
 
@@ -64,70 +69,24 @@
         await (await doc.getVariableByName(name)).setStringValue(value);
       }
     }
-
-    async function showCustomerPage() {
+    async function showOrderProfitsPage() {
       document.getElementById("page").innerHTML = `
-        <div class="chart">
+        <div class="dashboard">
           <qlik-embed
-            id="customer-ytd"
-            ui="analytics/chart"
+            id="order-profits"
+            ui="analytics/sheet"
             app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
-            object-id="d7d99717-a833-4f89-9b36-338c2a2a92d2"
-            identity="customer-ytd"
-            preview="true">
-          </qlik-embed>
-        </div>
-
-        <div class="chart">
-          <qlik-embed
-            id="customer-mtd"
-            ui="analytics/chart"
-            app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
-            object-id="d7d99717-a833-4f89-9b36-338c2a2a92d2"
-            identity="customer-mtd"
+            sheet-id="zjthm"
+            identity="order-profits"
             preview="true">
           </qlik-embed>
         </div>
       `;
-
-      await setVars("customer-ytd", {
-        vTimeFrame: "Year To Date",
-        vDyDim1: "Sold To Customer"
-      });
-
-      await setVars("customer-mtd", {
-        vTimeFrame: "Current Month To Date",
-        vDyDim1: "Material"
-      });
-    }
-
-    async function showProductPage() {
-      document.getElementById("page").innerHTML = `
-        <div class="chart">
-          <qlik-embed
-            id="product-chart"
-            ui="analytics/chart"
-            app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
-            object-id="d7d99717-a833-4f89-9b36-338c2a2a92d2"
-            identity="product"
-            preview="true">
-          </qlik-embed>
-        </div>
-      `;
-
-      await setVars("product-chart", {
-        vTimeFrame: "Current Month To Date",
-        vDyDim1: "Material"
-      });
     }
 
     async function showPage(page) {
-      if (page === "customer") {
-        await showCustomerPage();
-      }
-
-      if (page === "product") {
-        await showProductPage();
+      if (page === "order-profits") {
+        await showOrderProfitsPage();
       }
     }
 
@@ -135,7 +94,7 @@
       showPage(e.target.value);
     });
 
-    showPage("customer");
+    showPage("order-profits");
 
   </script>
 
