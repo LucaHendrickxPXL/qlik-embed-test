@@ -28,7 +28,6 @@
     app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
     object-id="d7d99717-a833-4f89-9b36-338c2a2a92d2"
     identity="ytd"
-    iframe="true"
     preview="true">
   </qlik-embed>
 
@@ -38,7 +37,6 @@
     app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
     object-id="d7d99717-a833-4f89-9b36-338c2a2a92d2"
     identity="mtd"
-    iframe="true"
     preview="true">
   </qlik-embed>
 
@@ -47,9 +45,8 @@
       const ref = await document.getElementById(id).getRefApi();
       const doc = await ref.getDoc();
 
-      for (const [name, value] of Object.entries(vars)) {
+      for (const [name, value] of Object.entries(vars))
         await (await doc.getVariableByName(name)).setStringValue(value);
-      }
     }
 
     async function init() {
