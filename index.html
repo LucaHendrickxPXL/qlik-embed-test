@@ -53,10 +53,10 @@
 
   async function init() {
     await Promise.all([
-      setVar("chart-ytd", "vTimeFrame", "YTD"),
-      setVar("chart-ytd", "vDyDim1", "Customer"),
-      setVar("chart-mtd", "vTimeFrame", "MTD"),
-      setVar("chart-mtd", "vDyDim1", "Product")
+      setVar("chart-ytd", "vTimeFrame", "Year To Date"),
+      setVar("chart-ytd", "vDyDim1", "Sold To Customer"),
+      setVar("chart-mtd", "vTimeFrame", "Month To Date"),
+      setVar("chart-mtd", "vDyDim1", "Material")
     ]);
   }
 
