@@ -111,10 +111,65 @@
 
   <script type="module">
 
-    async function setVars(id, vars) {
+    import {
+      auth,
+      qix
+    } from "https://cdn.jsdelivr.net/npm/@qlik/api@2/index.min.js";
+
+
+    const APP_ID = "a1bcf289-079b-4b4b-9cb7-eba889c13009";
+
+    const activeSessions = new Map();
+
+
+    auth.setDefaultHostConfig({
+      host: "arte.eu.qlikcloud.com",
+      authType: "Oauth2",
+      clientId: "019e8d5cbb34e31736201232f6779af7",
+      redirectUri: "https://qlik-embed-test-ed7r.vercel.app/index.html",
+      accessTokenStorage: "session",
+      autoRedirect: true
+    });
+
+
+    async function getSession(id) {
+      if (activeSessions.has(id)) {
+        return activeSessions.get(id);
+      }
+
       const embed = document.getElementById(id);
-      const ref = await embed.getRefApi();
-      const doc = await ref.getDoc();
+
+      if (!embed) {
+        throw new Error(`Qlik embed niet gevonden: ${id}`);
+      }
+
+      /*
+        Zorg dat qlik-embed eerst zijn session opent.
+        qlik-api/qix kan daarna dezelfde session hergebruiken.
+      */
+      await embed.getRefApi();
+
+      const session = qix.openAppSession({
+        appId: embed.getAttribute("app-id"),
+        identity: embed.getAttribute("identity")
+      });
+
+      await session.getDoc();
+
+      activeSessions.set(id, session);
+
+      return session;
+    }
+
+
+    async function getDoc(id) {
+      const session = await getSession(id);
+      return await session.getDoc();
+    }
+
+
+    async function setVars(id, vars) {
+      const doc = await getDoc(id);
 
       for (const [name, value] of Object.entries(vars)) {
         const variable = await doc.getVariableByName(name);
@@ -122,18 +177,15 @@
       }
     }
 
-    async function clearSelections(id) {
-      const embed = document.getElementById(id);
-      const ref = await embed.getRefApi();
-      const doc = await ref.getDoc();
 
+    async function clearSelections(id) {
+      const doc = await getDoc(id);
       await doc.clearAll(true);
     }
 
+
     async function setSelections(id, selections) {
-      const embed = document.getElementById(id);
-      const ref = await embed.getRefApi();
-      const doc = await ref.getDoc();
+      const doc = await getDoc(id);
 
       for (const [fieldName, values] of Object.entries(selections)) {
         const field = await doc.getField(fieldName);
@@ -148,19 +200,50 @@
     }
 
 
+    async function closeCurrentSessions() {
+      /*
+        Eerst de embeds uit de DOM halen.
+      */
+      document.getElementById("page").innerHTML = "";
+
+      const sessions = [...activeSessions.values()];
+
+      activeSessions.clear();
+
+      await Promise.allSettled(
+        sessions.map(async session => {
+          try {
+            await session.close();
+          } catch (error) {
+            console.warn("Qlik session kon niet worden gesloten", error);
+          }
+        })
+      );
+    }
+
+
     async function showOrderProfitsPage() {
       document.getElementById("page").innerHTML = `
         <div class="dashboard">
+
           <qlik-embed
             id="order-profits"
             ui="analytics/sheet"
-            app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
+            app-id="${APP_ID}"
             sheet-id="zjthm"
             identity="order-profits"
+            context___json='{"interactions":{"select":false}}'
             preview="true">
           </qlik-embed>
+
         </div>
       `;
+
+      await customElements.whenDefined("qlik-embed");
+
+      await getSession("order-profits");
+
+      await clearSelections("order-profits");
     }
 
 
@@ -172,9 +255,10 @@
             <qlik-embed
               id="customer-trend"
               ui="analytics/chart"
-              app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
+              app-id="${APP_ID}"
               object-id="4adfbf24-a1eb-4f2d-b2da-9563c0bd9740"
               identity="customer-trend"
+              context___json='{"interactions":{"select":false}}'
               preview="true">
             </qlik-embed>
           </div>
@@ -183,9 +267,10 @@
             <qlik-embed
               id="customer-ranking-1"
               ui="analytics/chart"
-              app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
+              app-id="${APP_ID}"
               object-id="039a7509-b334-48aa-b6c3-50e7da8c2904"
               identity="customer-ranking-1"
+              context___json='{"interactions":{"select":false}}'
               preview="true">
             </qlik-embed>
           </div>
@@ -194,9 +279,10 @@
             <qlik-embed
               id="customer-table"
               ui="analytics/chart"
-              app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
+              app-id="${APP_ID}"
               object-id="248d8ec4-b20e-46d4-84a7-1a8a13629f4d"
               identity="customer-table"
+              context___json='{"interactions":{"select":false}}'
               preview="true">
             </qlik-embed>
           </div>
@@ -205,9 +291,10 @@
             <qlik-embed
               id="customer-ranking-2"
               ui="analytics/chart"
-              app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
+              app-id="${APP_ID}"
               object-id="039a7509-b334-48aa-b6c3-50e7da8c2904"
               identity="customer-ranking-2"
+              context___json='{"interactions":{"select":false}}'
               preview="true">
             </qlik-embed>
           </div>
@@ -216,6 +303,14 @@
       `;
 
       await customElements.whenDefined("qlik-embed");
+
+      await Promise.all([
+        getSession("customer-trend"),
+        getSession("customer-ranking-1"),
+        getSession("customer-table"),
+        getSession("customer-ranking-2")
+      ]);
+
       await Promise.all([
         clearSelections("customer-trend"),
         clearSelections("customer-ranking-1"),
@@ -224,40 +319,49 @@
       ]);
 
       await Promise.all([
+
         setVars("customer-trend", {
           vTimeFrame: "All Time",
           vMeasCRM: "Delivered Turnover"
         }),
+
         setSelections("customer-trend", {
           Intercompany: "Non-Intercompany"
         }),
+
 
         setVars("customer-ranking-1", {
           vTimeFrame: "Current Year",
           vDyDimCrm: "Group Material",
           vMeasCRM: "Delivered Turnover"
         }),
+
         setSelections("customer-ranking-1", {
           Intercompany: "Non-Intercompany"
         }),
+
 
         setVars("customer-table", {
           vTimeFrame: "Current Year",
           vDyDimCrm: "Group Material",
           vMeasCRM: "Delivered Turnover"
         }),
+
         setSelections("customer-table", {
           Intercompany: "Non-Intercompany"
         }),
+
 
         setVars("customer-ranking-2", {
           vTimeFrame: "Current Year",
           vDyDimCrm: "Division",
           vMeasCRM: "Delivered Turnover"
         }),
-        setSelections("ustomer-ranking-2", {
+
+        setSelections("customer-ranking-2", {
           Intercompany: "Non-Intercompany"
         })
+
       ]);
     }
 
@@ -272,7 +376,7 @@
               <qlik-embed
                 id="samples-pareto"
                 ui="analytics/chart"
-                app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
+                app-id="${APP_ID}"
                 object-id="d7d99717-a833-4f89-9b36-338c2a2a92d2"
                 identity="samples-pareto"
                 context___json='{"interactions":{"select":false}}'
@@ -284,9 +388,10 @@
               <qlik-embed
                 id="samples-ranking"
                 ui="analytics/chart"
-                app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
+                app-id="${APP_ID}"
                 object-id="039a7509-b334-48aa-b6c3-50e7da8c2904"
                 identity="samples-ranking"
+                context___json='{"interactions":{"select":false}}'
                 preview="true">
               </qlik-embed>
             </div>
@@ -297,9 +402,10 @@
             <qlik-embed
               id="samples-trend"
               ui="analytics/chart"
-              app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
+              app-id="${APP_ID}"
               object-id="4adfbf24-a1eb-4f2d-b2da-9563c0bd9740"
               identity="samples-trend"
+              context___json='{"interactions":{"select":false}}'
               preview="true">
             </qlik-embed>
           </div>
@@ -310,43 +416,62 @@
       await customElements.whenDefined("qlik-embed");
 
       await Promise.all([
+        getSession("samples-pareto"),
+        getSession("samples-ranking"),
+        getSession("samples-trend")
+      ]);
+
+      await Promise.all([
         clearSelections("samples-pareto"),
         clearSelections("samples-ranking"),
         clearSelections("samples-trend")
       ]);
 
       await Promise.all([
+
         setVars("samples-pareto", {
           vTimeFrame: "Current Month",
           vDyDimCrm: "Sold To Customer",
           vMeasCRM: "Quantity Samples Delivered"
         }),
+
         setSelections("samples-pareto", {
           Intercompany: "Non-Intercompany"
         }),
+
 
         setVars("samples-ranking", {
           vTimeFrame: "Current Month",
           vDyDimCrm: "Sold To Customer",
           vMeasCRM: "Quantity Samples Delivered"
         }),
+
         setSelections("samples-ranking", {
           Intercompany: "Non-Intercompany"
         }),
+
 
         setVars("samples-trend", {
           vTimeFrame: "All Time",
           vMeasCRM: "Quantity Samples Delivered"
         }),
+
         setSelections("samples-trend", {
           Intercompany: "Non-Intercompany"
         })
+
       ]);
-      
     }
 
 
     async function showPage(page) {
+
+      /*
+        Sluit eerst alle sessions van de huidige pagina.
+      */
+      await closeCurrentSessions();
+
+
       if (page === "order-profits") {
         await showOrderProfitsPage();
       }
@@ -361,9 +486,30 @@
     }
 
 
-    document.getElementById("pageSelect").addEventListener("change", async e => {
-      await showPage(e.target.value);
+    document
+      .getElementById("pageSelect")
+      .addEventListener("change", async e => {
+        await showPage(e.target.value);
+      });
+
+
+    /*
+      Wanneer de volledige HTML-pagina wordt afgesloten
+      (bijvoorbeeld Dynamics Web Resource sluiten),
+      sluiten we de nog actieve sessions.
+    */
+    window.addEventListener("pagehide", () => {
+      for (const session of activeSessions.values()) {
+        try {
+          session.close();
+        } catch (error) {
+          console.warn("Qlik session kon niet worden gesloten", error);
+        }
+      }
+
+      activeSessions.clear();
     });
+
 
     showPage("order-profits");
 
