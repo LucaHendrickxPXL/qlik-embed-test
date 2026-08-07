@@ -20,45 +20,48 @@
   </script>
 
   <style>
-    body {
+    html, body {
       margin: 0;
+      width: 100%;
+      height: 100%;
       font-family: Arial, sans-serif;
     }
 
     .menu {
+      height: 50px;
       padding: 10px;
+      box-sizing: border-box;
       border-bottom: 1px solid #ddd;
     }
 
-    .chart {
+    .dashboard {
       width: 100%;
-      height: 400px;
+      height: calc(100vh - 50px);
     }
 
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  width: 100%;
-  height: calc(100vh - 50px);
-  gap: 8px;
-  padding: 8px;
-  box-sizing: border-box;
-}
-
-.dashboard-item {
-  min-width: 0;
-  min-height: 0;
-}
-
-.dashboard-item qlik-embed {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-    .chart qlik-embed,
     .dashboard qlik-embed {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      width: 100%;
+      height: calc(100vh - 50px);
+      gap: 8px;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    .dashboard-item {
+      min-width: 0;
+      min-height: 0;
+    }
+
+    .dashboard-item qlik-embed {
       display: block;
       width: 100%;
       height: 100%;
@@ -80,13 +83,16 @@
   <script type="module">
 
     async function setVars(id, vars) {
-      const ref = await document.getElementById(id).getRefApi();
+      const embed = document.getElementById(id);
+      const ref = await embed.getRefApi();
       const doc = await ref.getDoc();
 
       for (const [name, value] of Object.entries(vars)) {
-        await (await doc.getVariableByName(name)).setStringValue(value);
+        const variable = await doc.getVariableByName(name);
+        await variable.setStringValue(value);
       }
     }
+
     async function showOrderProfitsPage() {
       document.getElementById("page").innerHTML = `
         <div class="dashboard">
@@ -101,90 +107,94 @@
         </div>
       `;
     }
-async function showCustomerFiguresPage() {
-  document.getElementById("page").innerHTML = `
-    <div class="dashboard-grid">
 
-      <div class="dashboard-item">
-        <qlik-embed
-          id="order-trend"
-          ui="analytics/chart"
-          app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
-          object-id="4adfbf24-a1eb-4f2d-b2da-9563c0bd9740"
-          identity="order-trend"
-          preview="true">
-        </qlik-embed>
-      </div>
+    async function showCustomerFiguresPage() {
+      document.getElementById("page").innerHTML = `
+        <div class="dashboard-grid">
 
-      <div class="dashboard-item">
-        <qlik-embed
-          id="order-ranking-1"
-          ui="analytics/chart"
-          app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
-          object-id="039a7509-b334-48aa-b6c3-50e7da8c2904"
-          identity="order-ranking-1"
-          preview="true">
-        </qlik-embed>
-      </div>
+          <div class="dashboard-item">
+            <qlik-embed
+              id="customer-trend"
+              ui="analytics/chart"
+              app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
+              object-id="4adfbf24-a1eb-4f2d-b2da-9563c0bd9740"
+              identity="customer-trend"
+              preview="true">
+            </qlik-embed>
+          </div>
 
-      <div class="dashboard-item">
-        <qlik-embed
-          id="order-table"
-          ui="analytics/chart"
-          app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
-          object-id="248d8ec4-b20e-46d4-84a7-1a8a13629f4d"
-          identity="order-table"
-          preview="true">
-        </qlik-embed>
-      </div>
+          <div class="dashboard-item">
+            <qlik-embed
+              id="customer-ranking-1"
+              ui="analytics/chart"
+              app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
+              object-id="039a7509-b334-48aa-b6c3-50e7da8c2904"
+              identity="customer-ranking-1"
+              preview="true">
+            </qlik-embed>
+          </div>
 
-      <div class="dashboard-item">
-        <qlik-embed
-          id="order-ranking-2"
-          ui="analytics/chart"
-          app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
-          object-id="039a7509-b334-48aa-b6c3-50e7da8c2904"
-          identity="order-ranking-2"
-          preview="true">
-        </qlik-embed>
-      </div>
+          <div class="dashboard-item">
+            <qlik-embed
+              id="customer-table"
+              ui="analytics/chart"
+              app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
+              object-id="248d8ec4-b20e-46d4-84a7-1a8a13629f4d"
+              identity="customer-table"
+              preview="true">
+            </qlik-embed>
+          </div>
 
-    </div>
-  `;
+          <div class="dashboard-item">
+            <qlik-embed
+              id="customer-ranking-2"
+              ui="analytics/chart"
+              app-id="a1bcf289-079b-4b4b-9cb7-eba889c13009"
+              object-id="039a7509-b334-48aa-b6c3-50e7da8c2904"
+              identity="customer-ranking-2"
+              preview="true">
+            </qlik-embed>
+          </div>
 
-  await Promise.all([
-    setVars("order-trend", {
-      vTimeFrame: "All Time"
-    }),
+        </div>
+      `;
 
-    setVars("order-ranking-1", {
-      vTimeFrame: "Current Year",
-      vDyDimCrm: "Group Material"
-    }),
+      await customElements.whenDefined("qlik-embed");
 
-    setVars("order-table", {
-      vTimeFrame: "Current Year",
-      vDyDimCrm: "Group Material"
-    }),
+      await Promise.all([
+        setVars("customer-trend", {
+          vTimeFrame: "All Time"
+        }),
 
-    setVars("order-ranking-2", {
-      vTimeFrame: "Current Year",
-      vDyDimCrm: "Division"
-    })
-  ]);
-}
+        setVars("customer-ranking-1", {
+          vTimeFrame: "Current Year",
+          vDyDimCrm: "Group Material"
+        }),
+
+        setVars("customer-table", {
+          vTimeFrame: "Current Year",
+          vDyDimCrm: "Group Material"
+        }),
+
+        setVars("customer-ranking-2", {
+          vTimeFrame: "Current Year",
+          vDyDimCrm: "Division"
+        })
+      ]);
+    }
 
     async function showPage(page) {
       if (page === "order-profits") {
         await showOrderProfitsPage();
       }
+
       if (page === "customer-figures") {
         await showCustomerFiguresPage();
       }
     }
 
-    document.getElementById("pageSelect").addEventListener("change", e => {
-      showPage(e.target.value);
+    document.getElementById("pageSelect").addEventListener("change", async e => {
+      await showPage(e.target.value);
     });
 
     showPage("order-profits");
