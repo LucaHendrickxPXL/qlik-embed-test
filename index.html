@@ -29,8 +29,7 @@
     object-id="d7d99717-a833-4f89-9b36-338c2a2a92d2"
     identity="ytd"
     iframe="true"
-    preview="true"
-    identity="ytd">
+    preview="true">
   </qlik-embed>
 
   <qlik-embed
@@ -40,28 +39,34 @@
     object-id="d7d99717-a833-4f89-9b36-338c2a2a92d2"
     identity="mtd"
     iframe="true"
-    preview="true"
-    identity="ytd">
+    preview="true">
   </qlik-embed>
 
-<script type="module">
-  async function setVar(id, name, value) {
-    const ref = await document.getElementById(id).getRefApi();
-    const doc = await ref.getDoc();
-    await (await doc.getVariableByName(name)).setStringValue(value);
-  }
+  <script type="module">
+    async function setVars(id, vars) {
+      const ref = await document.getElementById(id).getRefApi();
+      const doc = await ref.getDoc();
 
-  async function init() {
-    await Promise.all([
-      setVar("chart-ytd", "vTimeFrame", "Year To Date"),
-      setVar("chart-ytd", "vDyDim1", "Sold To Customer"),
-      setVar("chart-mtd", "vTimeFrame", "Month To Date"),
-      setVar("chart-mtd", "vDyDim1", "Material")
-    ]);
-  }
+      for (const [name, value] of Object.entries(vars)) {
+        await (await doc.getVariableByName(name)).setStringValue(value);
+      }
+    }
 
-  init();
-</script>
+    async function init() {
+      await Promise.all([
+        setVars("chart-ytd", {
+          vTimeFrame: "Year To Date",
+          vDyDim1: "Sold To Customer"
+        }),
+        setVars("chart-mtd", {
+          vTimeFrame: "Current Month To Date",
+          vDyDim1: "Material"
+        })
+      ]);
+    }
+
+    init();
+  </script>
 
 </body>
 </html>
