@@ -122,6 +122,23 @@
       }
     }
 
+    async function setSelections(id, selections) {
+  const embed = document.getElementById(id);
+  const ref = await embed.getRefApi();
+  const doc = await ref.getDoc();
+
+  for (const [fieldName, values] of Object.entries(selections)) {
+    const field = await doc.getField(fieldName);
+
+    await field.clear();
+
+    await field.selectValues(
+      (Array.isArray(values) ? values : [values])
+        .map(value => ({ qText: value }))
+    );
+  }
+}
+
 
     async function showOrderProfitsPage() {
       document.getElementById("page").innerHTML = `
@@ -197,11 +214,17 @@
           vTimeFrame: "All Time",
           vMeasCRM: "Delivered Turnover"
         }),
+        setSelections("customer-trend", {
+          Intercompany: "Non-intercompany"
+        }),
 
         setVars("customer-ranking-1", {
           vTimeFrame: "Current Year",
           vDyDimCrm: "Group Material",
           vMeasCRM: "Delivered Turnover"
+        }),
+        setSelections("customer-ranking-1", {
+          Intercompany: "Non-intercompany"
         }),
 
         setVars("customer-table", {
@@ -209,11 +232,17 @@
           vDyDimCrm: "Group Material",
           vMeasCRM: "Delivered Turnover"
         }),
+        setSelections("customer-table", {
+          Intercompany: "Non-intercompany"
+        }),
 
         setVars("customer-ranking-2", {
           vTimeFrame: "Current Year",
           vDyDimCrm: "Division",
           vMeasCRM: "Delivered Turnover"
+        }),
+        setSelections("ustomer-ranking-2", {
+          Intercompany: "Non-intercompany"
         })
       ]);
     }
@@ -272,16 +301,25 @@
           vDyDimCrm: "Sold To Customer",
           vMeasCRM: "Quantity Samples Delivered"
         }),
+        setSelections("samples-pareto", {
+          Intercompany: "Non-intercompany"
+        }),
 
         setVars("samples-ranking", {
           vTimeFrame: "Current Month",
           vDyDimCrm: "Sold To Customer",
           vMeasCRM: "Quantity Samples Delivered"
         }),
+        setSelections("samples-ranking", {
+          Intercompany: "Non-intercompany"
+        }),
 
         setVars("samples-trend", {
           vTimeFrame: "All Time",
           vMeasCRM: "Quantity Samples Delivered"
+        }),
+        setSelections("samples-trend", {
+          Intercompany: "Non-intercompany"
         })
       ]);
       
