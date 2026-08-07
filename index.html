@@ -38,21 +38,24 @@
     identity="mtd">
   </qlik-embed>
 
-  <script type="module">
-    async function setVar(id, name, value) {
-      const ref = await document.getElementById(id).getRefApi();
-      const doc = await ref.getDoc();
-      await (await doc.getVariableByName(name)).setStringValue(value);
-    }
+<script type="module">
+  async function setVar(id, name, value) {
+    const ref = await document.getElementById(id).getRefApi();
+    const doc = await ref.getDoc();
+    await (await doc.getVariableByName(name)).setStringValue(value);
+  }
 
+  async function init() {
     await Promise.all([
       setVar("chart-ytd", "vTimeFrame", "YTD"),
       setVar("chart-ytd", "vDyDim1", "Customer"),
-
       setVar("chart-mtd", "vTimeFrame", "MTD"),
       setVar("chart-mtd", "vDyDim1", "Product")
     ]);
-  </script>
+  }
+
+  init();
+</script>
 
 </body>
 </html>
